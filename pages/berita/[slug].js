@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Layout from "../../components/Layout";
-import TikTokCTA from "../../components/TikTokCTA";
+import TikTokCTA from "../../components/TiktokCTA";
 import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import {
