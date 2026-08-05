@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  font-size: 100%;
+  transition: font-size 0.15s ease;
+}
+
+/* Mode perbesar teks — karena semua ukuran font Tailwind pakai rem,
+   menaikkan font-size di <html> otomatis membesarkan seluruh teks di situs. */
+html.teks-besar {
+  font-size: 118%;
+}
+html.teks-sangat-besar {
+  font-size: 136%;
+}
+
+/* Mode kontras tinggi — teks lebih gelap & tebal, garis batas lebih jelas */
+html.kontras-tinggi body {
+  background-color: #ffffff;
+}
+html.kontras-tinggi .desa-text-muted {
+  color: #1a1a1a !important;
+}
+html.kontras-tinggi * {
+  border-color: #000 !important;
+}
+
+body {
+  background-color: #f6f3ea;
+  color: #1f2a20;
+}
+
+/* Leaflet perlu tinggi eksplisit pada container peta */
+.leaflet-map-container {
+  height: 480px;
+  width: 100%;
+  border-radius: 0.75rem;
+  z-index: 0;
+}
+
+.leaflet-container {
+  z-index: 0;
+}
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 10; /* turunkan dari default */
+}
