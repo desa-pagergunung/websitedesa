@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Layout from "../components/Layout";
 import { supabase } from "../lib/supabaseClient";
-import TikTokCTA from "../components/TiktokCTA";
+import TiktokCTA from "../components/TiktokCTA";
 import { PlayCircle } from "lucide-react";
 
 function extractVideoId(url) {
@@ -36,7 +36,7 @@ export default function Galeri({ data, videos }) {
 
         {/* ---------- CTA utama ke TikTok ---------- */}
         <div className="mb-10">
-          <TikTokCTA variant="card" />
+          <TiktokCTA variant="card" />
         </div>
 
         {/* ---------- Video terbaru (embed resmi TikTok, opsional) ---------- */}

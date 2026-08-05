@@ -2,7 +2,7 @@ import { Music2, ArrowUpRight } from "lucide-react";
 
 const TIKTOK_USERNAME = "info.pagergunung";
 
-export default function TikTokCTA({ variant = "banner" }) {
+export default function TiktokCTA({ variant = "banner" }) {
   const profileUrl = `https://www.tiktok.com/@${TIKTOK_USERNAME}`;
 
   if (variant === "card") {

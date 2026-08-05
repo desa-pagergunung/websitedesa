@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Layout from "../../components/Layout";
-import TikTokCTA from "../../components/TiktokCTA";
+import TiktokCTA from "../../components/TiktokCTA";
 import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -207,7 +207,7 @@ export default function BeritaDetail({ berita, related }) {
           </section>
         )}
         <div className="max-w-3xl mx-auto mt-10">
-          <TikTokCTA variant="banner" />
+          <TiktokCTA variant="banner" />
         </div>
       </div>
     </Layout>

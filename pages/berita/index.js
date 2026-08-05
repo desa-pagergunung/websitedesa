@@ -3,7 +3,7 @@ import Layout from "../../components/Layout";
 import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { Calendar, Newspaper, ImageIcon, ArrowRight } from "lucide-react";
-import TikTokCTA from "../../components/TiktokCTA";
+import TiktokCTA from "../../components/TiktokCTA";
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -172,7 +172,7 @@ export default function BeritaList({ data }) {
               </p>
             )}
             <div className="mt-10">
-              <TikTokCTA variant="banner" />
+              <TiktokCTA variant="banner" />
             </div>
           </>
         )}
