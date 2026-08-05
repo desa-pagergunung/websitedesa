@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Layout from "../components/Layout";
 import { supabase } from "../lib/supabaseClient";
-import TikTokCTA from "../components/TikTokCTA";
+import TikTokCTA from "../components/TiktokCTA";
 import { PlayCircle } from "lucide-react";
 
 function extractVideoId(url) {
