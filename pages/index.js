@@ -120,37 +120,54 @@ const CARD_BG = [
   "bg-desa-cream/60",
 ];
 
-// Data 4 dusun — tiap dusun jadi "lingkaran terasering" yang bisa diklik.
+// Koordinat mapX/mapY dalam satuan viewBox SVG asli (0-1595, 0-2270).
+// GANTI angka ini sesuai lokasi asli tiap dusun di peta kamu.
 const DUSUN_LIST = [
   {
     id: "pasuruan",
     nama: "Dusun Pasuruan",
-    kadus: "Bapak ..... (isi nama)",
-    telepon: "0812xxxxxxxx",
-    size: 168,
+    kadus: "0822-4059-3891",
+    telepon: "082240593891",
+    warga: "237 Kepala Keluarga",
+    foto: "/images/pasuruan.webp",
+    mapX: 250,
+    mapY: 450,
   },
   {
     id: "pondok-mangir",
     nama: "Dusun Pondok Mangir",
-    kadus: "Bapak ..... (isi nama)",
-    telepon: "0812xxxxxxxx",
-    size: 196,
+    kadus: "0852-2568-6957",
+    telepon: "085225686957",
+    warga: "209 Kepala Keluarga",
+    foto: "/images/pondokmangir.webp",
+    mapX: 750,
+    mapY: 900,
   },
   {
     id: "bojongaren",
     nama: "Dusun Bojongaren",
-    kadus: "Bapak ..... (isi nama)",
-    telepon: "0812xxxxxxxx",
-    size: 224,
+    kadus: "0882-0010-52046",
+    telepon: "0882001052046",
+    warga: "377 Kepala Keluarga",
+    foto: "/images/bojongaren.webp",
+    mapX: 1150,
+    mapY: 1350,
   },
   {
     id: "pagergunung",
     nama: "Dusun Pagergunung",
-    kadus: "Bapak ..... (isi nama)",
-    telepon: "0812xxxxxxxx",
-    size: 252,
+    kadus: "0852-2568-6957",
+    telepon: "085225686957",
+    warga: "139 Kepala Keluarga",
+    foto: "/images/pagergunung.webp",
+    mapX: 950,
+    mapY: 1900,
   },
 ];
+
+// Ukuran asli viewBox file peta-pg.svg
+const MAP_WIDTH = 1595;
+const MAP_HEIGHT = 2270;
 
 const FONT_DISPLAY = "'Plus Jakarta Sans', 'Inter', sans-serif";
 
@@ -158,6 +175,51 @@ const FONT_DISPLAY = "'Plus Jakarta Sans', 'Inter', sans-serif";
 const SECTION_X = "px-5 sm:px-8 md:px-10 lg:px-12 xl:px-16 2xl:px-20";
 const SECTION_Y = "py-16 sm:py-20 md:py-24 lg:py-28";
 const CONTAINER = "max-w-7xl mx-auto";
+
+// Kartu dusun — dipakai di kolom kiri/kanan (desktop) dan grid fallback (mobile).
+function DusunCard({ dusun, active, onClick }) {
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      className={`
+        group text-left bg-white rounded-2xl overflow-hidden shadow-sm ring-1
+        hover:-translate-y-1 hover:shadow-lg transition-all duration-300
+        ${
+          active ? "ring-desa-green ring-2" : "ring-black/5 hover:ring-black/10"
+        }
+      `}
+    >
+      <div className="relative h-28 sm:h-32 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={
+            dusun.foto || placeholderImage(`dusun-card-${dusun.id}`, 400, 300)
+          }
+          alt={dusun.nama}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <span className="absolute top-3 left-3 inline-flex items-center gap-1 bg-white/90 backdrop-blur-sm text-desa-green text-[10px] font-bold px-2.5 py-1 rounded-full">
+          <Users size={11} /> {dusun.warga}
+        </span>
+      </div>
+      <div className="p-4">
+        <p
+          style={{ fontFamily: FONT_DISPLAY }}
+          className="font-bold text-desa-green text-sm leading-snug mb-1"
+        >
+          {dusun.nama}
+        </p>
+        <p className="text-gray-500 text-xs mb-2">{dusun.kadus}</p>
+        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-desa-leaf">
+          Lihat di Peta <ChevronRight size={12} />
+        </span>
+      </div>
+    </button>
+  );
+}
 
 // ---------- Util: parallax sederhana berbasis scroll position ----------
 function useParallax(speed = 0.3) {
@@ -281,11 +343,11 @@ export default function Home({ profil, kontakUtama, beritaTerbaru }) {
         />
 
         <div
-          className={`relative z-10 ${CONTAINER} ${SECTION_X} pt-14 sm:pt-20 pb-6`}
+          className={`relative z-10 ${CONTAINER} ${SECTION_X} pt-10 sm:pt-20 pb-6`}
         >
           {/* Badge pill */}
           <div className="flex justify-center mb-6 sm:mb-7">
-            <span className="fade-up inline-flex items-center gap-2 text-[11px] sm:text-xs font-medium text-gray-600 bg-white border border-gray-200 shadow-sm px-4 py-2 rounded-full">
+            <span className="fade-up max-w-[92%] mx-auto inline-flex items-center justify-center gap-2 text-center whitespace-normal leading-snug text-[10px] sm:text-xs font-medium text-gray-600 bg-white border border-gray-200 shadow-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-full">
               {/* <Sparkles size={13} className="text-desa-gold" /> */}
               Situs Resmi Desa Pagergunung, Pangandaran, Jawa Barat
             </span>
@@ -294,7 +356,7 @@ export default function Home({ profil, kontakUtama, beritaTerbaru }) {
           {/* Headline */}
           <h1
             style={{ fontFamily: FONT_DISPLAY }}
-            className="fade-up text-center text-[30px] leading-[1.15] sm:text-5xl md:text-[56px] font-extrabold text-desa-green tracking-tight max-w-3xl mx-auto mb-4 sm:mb-5"
+            className="fade-up text-center text-[26px] leading-[1.2] sm:text-5xl md:text-[56px] font-extrabold text-desa-green tracking-tight max-w-3xl mx-auto mb-4 sm:mb-5 px-2 sm:px-0"
           >
             LAYANAN DESA UNTUK <span className="text-desa-leaf">WARGA</span>{" "}
             YANG MAJU
@@ -365,7 +427,7 @@ export default function Home({ profil, kontakUtama, beritaTerbaru }) {
         {statistik.length > 0 && (
           <div className="relative border-t border-gray-100">
             <div
-              className={`${CONTAINER} ${SECTION_X} py-7 sm:py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8`}
+              className={`${CONTAINER} ${SECTION_X} py-7 sm:py-8 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8`}
             >
               {statistik.map((s) => (
                 <div key={s.label} className="text-center">
@@ -447,8 +509,8 @@ export default function Home({ profil, kontakUtama, beritaTerbaru }) {
         </div>
       </section>
 
-      {/* ================= 4 DUSUN ================= */}
-      <section>
+      {/* ================= 4 DUSUN — peta di tengah, kartu kiri-kanan ================= */}
+      <section className="relative left-1/2 -translate-x-1/2 w-screen bg-white">
         <div className={`${CONTAINER} ${SECTION_X} py-16 sm:py-20`}>
           <div className="text-center max-w-xl mx-auto mb-10 sm:mb-14">
             <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-[0.15em] font-bold text-desa-leaf mb-4">
@@ -461,85 +523,187 @@ export default function Home({ profil, kontakUtama, beritaTerbaru }) {
               4 Dusun di Desa Pagergunung
             </h2>
             <p className="text-gray-500 text-sm sm:text-base leading-relaxed">
-              Klik salah satu dusun untuk melihat Kepala Dusun dan nomor kontak
-              yang bisa dihubungi.
+              Klik salah satu pin di peta atau kartu untuk melihat Kepala Dusun
+              dan nomor kontak yang bisa dihubungi.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            {DUSUN_LIST.map((dusun) => (
-              <button
-                key={dusun.id}
-                onClick={() => setSelectedDusun(dusun)}
-                className="group text-left bg-white rounded-2xl shadow-sm ring-1 ring-black/5 hover:ring-black/10 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 p-5 sm:p-6"
+          {/* ---------- Layout 3 kolom: kartu kiri | peta | kartu kanan ---------- */}
+          <div
+            className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(280px,340px)_1fr] gap-6 lg:gap-8 items-start"
+            onClick={() => setSelectedDusun(null)}
+          >
+            {/* Kolom kiri — 2 kartu tumpuk */}
+            <div className="hidden lg:flex flex-col gap-5">
+              {DUSUN_LIST.slice(0, 2).map((dusun) => (
+                <DusunCard
+                  key={dusun.id}
+                  dusun={dusun}
+                  active={selectedDusun?.id === dusun.id}
+                  onClick={() =>
+                    setSelectedDusun(
+                      selectedDusun?.id === dusun.id ? null : dusun
+                    )
+                  }
+                />
+              ))}
+            </div>
+
+            {/* Kolom tengah — peta */}
+            <div
+              className="relative w-full max-w-sm mx-auto lg:sticky lg:top-24"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                className="relative w-full rounded-[28px] bg-[#F3F4F1] ring-1 ring-black/5 shadow-sm isolate"
+                style={{ aspectRatio: `${MAP_WIDTH} / ${MAP_HEIGHT}` }}
+                onClick={() => setSelectedDusun(null)}
               >
-                <span className="w-11 h-11 rounded-xl bg-desa-green/8 text-desa-green flex items-center justify-center mb-4 group-hover:bg-desa-green group-hover:text-white transition-colors">
-                  <MapPin size={20} strokeWidth={2} />
-                </span>
-                <p
-                  style={{ fontFamily: FONT_DISPLAY }}
-                  className="font-bold text-desa-green text-sm sm:text-base leading-snug mb-2"
-                >
-                  {dusun.nama}
-                </p>
-                <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-desa-leaf opacity-0 group-hover:opacity-100 transition-opacity">
-                  Lihat Kadus <ChevronRight size={12} />
-                </span>
-              </button>
-            ))}
+                {/* Layer svg — di-clip sendiri, tidak ikut motong pin/card */}
+                <div className="absolute inset-0 rounded-[28px] overflow-hidden pointer-events-none">
+                  <svg
+                    viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
+                    className="absolute inset-0 w-full h-full"
+                    preserveAspectRatio="xMidYMid meet"
+                  >
+                    <defs>
+                      <radialGradient id="mapGlow" cx="30%" cy="20%" r="70%">
+                        <stop offset="0%" stopColor="#F6F3EA" />
+                        <stop offset="100%" stopColor="#F3F4F1" />
+                      </radialGradient>
+                    </defs>
+                    <rect
+                      width={MAP_WIDTH}
+                      height={MAP_HEIGHT}
+                      fill="url(#mapGlow)"
+                    />
+                    <path
+                      d="M228.444 113.155L256.199 0L202.825 113.155L136.64 207.095L83.2648 296.764V420.594L111.02 473.969L136.64 597.799L111.02 657.579L96.0748 811.298L12.81 894.563L0 967.153L61.9149 1014.12L83.2648 1056.82L12.81 1197.73L29.8899 1244.7L202.825 1281L264.739 1263.92L337.329 1244.7H390.704L510.264 1302.35L555.099 1263.92H614.879V1302.35L708.818 1368.53L762.193 1426.18H830.513H847.593L809.163 1483.82L830.513 1513.71L809.163 1579.9L900.968 1639.68L954.343 1626.87L1003.45 1639.68L988.503 1695.19L830.513 2109.38H868.943L830.513 2239.61H988.503L1095.25 2269.5L1178.52 2216.12L1238.3 2109.38L1298.08 2023.98L1345.05 1906.55V1789.13L1298.08 1626.87L1270.32 1552.14V1513.71L1321.56 1483.82L1364.26 1396.29L1381.34 1302.35L1364.26 1197.73L1398.42 1108.06H1419.77L1460.34 1076.04L1419.77 1035.47L1503.04 1056.82L1460.34 1014.12L1479.55 982.098L1543.6 958.613L1560.68 1014.12H1594.84V982.098L1560.68 941.533H1594.84V894.563L1560.68 841.188L1543.6 800.623H1460.34H1321.56L1184.92 742.978L1165.71 764.328L1137.95 742.978L1084.58 696.008L965.018 670.388L826.243 578.584H760.058L649.039 501.724L550.829 420.594L437.674 384.299L390.704 360.814L339.464 207.095L228.444 113.155Z"
+                      fill="#E4E9DC"
+                      stroke="#3F5C3B"
+                      strokeWidth="4"
+                      strokeOpacity="0.25"
+                    />
+                  </svg>
+                </div>
+
+                {/* Pin tiap dusun */}
+                {DUSUN_LIST.map((dusun) => {
+                  const active = selectedDusun?.id === dusun.id;
+                  const leftPct = (dusun.mapX / MAP_WIDTH) * 100;
+                  const topPct = (dusun.mapY / MAP_HEIGHT) * 100;
+                  return (
+                    <div
+                      key={dusun.id}
+                      className={`absolute -translate-x-1/2 -translate-y-1/2 ${
+                        active ? "z-30" : "z-10"
+                      }`}
+                      style={{ top: `${topPct}%`, left: `${leftPct}%` }}
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedDusun(active ? null : dusun);
+                        }}
+                        aria-label={dusun.nama}
+                        className="relative flex items-center justify-center"
+                      >
+                        {active && (
+                          <span className="absolute inset-0 -m-2 rounded-full bg-desa-green/30 animate-ping" />
+                        )}
+                        <span
+                          className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-colors ${
+                            active
+                              ? "bg-desa-green text-white"
+                              : "bg-white text-desa-green ring-1 ring-black/10"
+                          }`}
+                        >
+                          <MapPin size={18} strokeWidth={2.3} />
+                        </span>
+                      </button>
+
+                      {active && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="
+                      fade-up absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2
+                      w-56 sm:w-64 bg-white rounded-2xl shadow-2xl ring-1 ring-black/5
+                      overflow-hidden text-left
+                    "
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={
+                              dusun.foto ||
+                              placeholderImage(`dusun-${dusun.id}`, 400, 260)
+                            }
+                            alt={dusun.nama}
+                            className="w-full h-28 sm:h-32 object-cover"
+                          />
+                          <div className="p-4">
+                            <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-desa-leaf mb-1">
+                              Kepala Dusun
+                            </p>
+                            <p
+                              style={{ fontFamily: FONT_DISPLAY }}
+                              className="font-extrabold text-desa-green text-sm leading-snug mb-1"
+                            >
+                              {dusun.nama}
+                            </p>
+                            <p className="text-gray-500 text-xs mb-3">
+                              {dusun.kadus}
+                            </p>
+                            <a
+                              href={`tel:${dusun.telepon}`}
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-desa-green px-3 py-2 rounded-full hover:-translate-y-0.5 transition-transform"
+                            >
+                              <Phone size={13} />
+                              {dusun.telepon}
+                            </a>
+                          </div>
+                          <span className="absolute left-1/2 -bottom-1.5 -translate-x-1/2 w-3 h-3 bg-white rotate-45 ring-1 ring-black/5" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Kolom kanan — 2 kartu tumpuk */}
+            <div className="hidden lg:flex flex-col gap-5">
+              {DUSUN_LIST.slice(2, 4).map((dusun) => (
+                <DusunCard
+                  key={dusun.id}
+                  dusun={dusun}
+                  active={selectedDusun?.id === dusun.id}
+                  onClick={() =>
+                    setSelectedDusun(
+                      selectedDusun?.id === dusun.id ? null : dusun
+                    )
+                  }
+                />
+              ))}
+            </div>
+
+            {/* Mobile/tablet fallback — semua kartu jadi grid biasa di bawah peta */}
+            <div className="grid grid-cols-2 gap-4 lg:hidden">
+              {DUSUN_LIST.map((dusun) => (
+                <DusunCard
+                  key={dusun.id}
+                  dusun={dusun}
+                  active={selectedDusun?.id === dusun.id}
+                  onClick={() =>
+                    setSelectedDusun(
+                      selectedDusun?.id === dusun.id ? null : dusun
+                    )
+                  }
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
-
-      {/* ================= POPUP DUSUN ================= */}
-      {selectedDusun && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-5"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setSelectedDusun(null)}
-        >
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-desa-green/60 backdrop-blur-sm"
-          />
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative z-10 w-full max-w-sm bg-white rounded-3xl shadow-2xl p-7 sm:p-8 text-center fade-up"
-          >
-            <button
-              onClick={() => setSelectedDusun(null)}
-              aria-label="Tutup"
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-desa-cream text-desa-green flex items-center justify-center hover:bg-desa-green hover:text-white transition-colors"
-            >
-              <X size={16} />
-            </button>
-
-            <span className="mx-auto w-14 h-14 rounded-full bg-desa-green text-white flex items-center justify-center mb-4">
-              <MapPin size={22} />
-            </span>
-
-            <p className="text-[11px] uppercase tracking-[0.15em] font-bold text-desa-leaf mb-1">
-              Kepala Dusun
-            </p>
-            <h3
-              style={{ fontFamily: FONT_DISPLAY }}
-              className="text-xl sm:text-2xl font-extrabold text-desa-green mb-1"
-            >
-              {selectedDusun.nama}
-            </h3>
-            <p className="text-gray-600 text-sm mb-6">{selectedDusun.kadus}</p>
-
-            <a
-              href={`tel:${selectedDusun.telepon}`}
-              className="inline-flex items-center gap-2 bg-desa-gold text-desa-green font-semibold text-sm px-6 py-3 rounded-full hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300"
-            >
-              <Phone size={16} />
-              {selectedDusun.telepon}
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* ================= KENAPA DESA KAMI — foto susun kiri, kartu fitur kanan ================= */}
       <section className="relative left-1/2 -translate-x-1/2 w-screen bg-desa-cream">
@@ -816,7 +980,7 @@ export default function Home({ profil, kontakUtama, beritaTerbaru }) {
               },
               {
                 title: "Cengkeh",
-                image: "/images/potensi/cengkeh.webp",
+                image: "/images/cengkeh.webp",
                 number: "300 Kg",
                 desc: "Hasil perkebunan cengkeh menjadi pendukung pendapatan masyarakat pada musim panen.",
               },
@@ -1077,7 +1241,7 @@ export default function Home({ profil, kontakUtama, beritaTerbaru }) {
           className={`${CONTAINER} ${SECTION_X} relative z-10 py-16 sm:py-20`}
         >
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-4 py-2 text-xs font-semibold uppercase tracking-wider text-desa-gold mb-6">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/90 bg-white/90 backdrop-blur-md px-4 py-2 text-xs font-semibold uppercase tracking-wider text-black mb-6">
               <Landmark size={14} />
               Pemerintah Desa Pagergunung
             </span>
@@ -1114,7 +1278,7 @@ export default function Home({ profil, kontakUtama, beritaTerbaru }) {
               {nomorTelepon && (
                 <a
                   href={`tel:${nomorTelepon}`}
-                  className="inline-flex items-center gap-2 rounded-full bg-desa-gold px-7 py-3.5 text-sm font-semibold text-desa-green hover:-translate-y-0.5 transition-all duration-300"
+                  className="inline-flex items-center gap-2 rounded-full bg-desa-gold px-7 py-3.5 text-sm font-semibold text-white hover:-translate-y-0.5 transition-all duration-300"
                 >
                   <Phone size={16} />
                   Hubungi Kantor Desa
@@ -1161,7 +1325,7 @@ function ClotheslineCard({ item, className = "", style }) {
         aria-hidden="true"
         className={`absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-sm rotate-45 ${pinColor} shadow-sm z-10`}
       />
-      <div className="h-24 sm:h-28 overflow-hidden">
+      <div className="aspect-[4/3] sm:aspect-auto sm:h-28 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={

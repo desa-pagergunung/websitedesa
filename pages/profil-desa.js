@@ -3,8 +3,6 @@ import Image from "next/image";
 import Layout from "../components/Layout";
 import { supabase } from "../lib/supabaseClient";
 import {
-  Target,
-  Quote,
   MapPin,
   Users,
   Home,
@@ -15,6 +13,7 @@ import {
   MessageCircle,
   UserRound,
   ChevronRight,
+  ArrowLeft,
   X,
 } from "lucide-react";
 
@@ -23,12 +22,12 @@ const DEFAULT_PROFIL = {
   kecamatan: "Pangandaran",
   kabupaten: "Pangandaran",
   provinsi: "Jawa Barat",
-  luas_wilayah: "—",
+  luas_wilayah: "17,00 Ha (0,17 km²)",
   jumlah_dusun: "4",
   jumlah_kk: "1.061",
   jumlah_penduduk: "2.643",
   nama_kades: "Pak Sahili",
-  foto_kantor: null,
+  foto_kantor: "/images/tulisan-kandes.webp",
   foto_kades: null,
   visi: "TERWUJUDNYA IMAN DAN TAQWA PEMERINTAH DESA PAGERGUNUNG MENJADIKAN PELAYANAN MASYARAKAT YANG HAKIKI, SUBUR MAKMUR GEMAH RIPAH LOHJINAWI",
   misi: [
@@ -63,28 +62,29 @@ const STATS = (data) => [
   { icon: MapPin, label: "Penduduk", value: data.jumlah_penduduk },
 ];
 
-/** Faint topographic contour lines — the page's one signature motif. */
-function ContourPattern({ className = "" }) {
+// Sistem padding & container konsisten — sama dengan halaman lain.
+const CONTAINER = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
+const SECTION_Y = "py-12 sm:py-16 lg:py-20";
+
+// Header seksi standar: eyebrow + judul + garis aksen tengah — pola umum
+// dipakai di hampir semua website resmi pemerintah desa.
+function SectionHeading({ eyebrow, title, center = true }) {
   return (
-    <svg
-      viewBox="0 0 400 300"
-      className={className}
-      aria-hidden="true"
-      preserveAspectRatio="xMidYMid slice"
-    >
-      {[40, 75, 110, 145, 180, 215].map((r, i) => (
-        <path
-          key={r}
-          d={`M -20 ${300 - r} C 80 ${260 - r}, 150 ${340 - r}, 240 ${
-            260 - r
-          } S 380 ${190 - r}, 440 ${240 - r}`}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          opacity={0.5 - i * 0.06}
-        />
-      ))}
-    </svg>
+    <div className={center ? "text-center mb-10 sm:mb-12" : "mb-10 sm:mb-12"}>
+      {eyebrow && (
+        <p className="uppercase tracking-[0.15em] text-xs sm:text-sm font-semibold text-desa-gold mb-2">
+          {eyebrow}
+        </p>
+      )}
+      <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-desa-green">
+        {title}
+      </h2>
+      <div
+        className={`h-1 w-14 bg-desa-gold rounded-full mt-4 ${
+          center ? "mx-auto" : ""
+        }`}
+      />
+    </div>
   );
 }
 
@@ -96,6 +96,12 @@ export default function ProfilDesa({ profil }) {
     kecamatan: profil?.kecamatan || DEFAULT_PROFIL.kecamatan,
     kabupaten: profil?.kabupaten || DEFAULT_PROFIL.kabupaten,
     provinsi: profil?.provinsi || DEFAULT_PROFIL.provinsi,
+    luas_wilayah: profil?.luas_wilayah || DEFAULT_PROFIL.luas_wilayah,
+    jumlah_dusun: profil?.jumlah_dusun || DEFAULT_PROFIL.jumlah_dusun,
+    jumlah_kk: profil?.jumlah_kk || DEFAULT_PROFIL.jumlah_kk,
+    jumlah_penduduk: profil?.jumlah_penduduk || DEFAULT_PROFIL.jumlah_penduduk,
+    nama_kades: profil?.nama_kades || DEFAULT_PROFIL.nama_kades,
+    foto_kantor: profil?.foto_kantor || DEFAULT_PROFIL.foto_kantor,
     visi: profil?.visi || DEFAULT_PROFIL.visi,
     misi: profil?.misi || DEFAULT_PROFIL.misi,
     alamat_kantor: profil?.alamat_kantor || DEFAULT_PROFIL.alamat_kantor,
@@ -111,7 +117,6 @@ export default function ProfilDesa({ profil }) {
   };
   const misiList = (data.misi || "").split("\n").filter(Boolean);
 
-  // embed URL untuk peta langsung tanpa tombol
   const mapsEmbedUrl = `${data.maps_url}${
     data.maps_url.includes("?") ? "&" : "?"
   }output=embed`;
@@ -125,9 +130,9 @@ export default function ProfilDesa({ profil }) {
   }
 
   return (
-    <Layout title="Profil Desa">
-      {/* ---------- HERO: Foto Kantor Desa full satu halaman ---------- */}
-      <div className="relative w-full h-screen">
+    <Layout title="Profil Desa" addTopSpacing={false}>
+      {/* ================= HERO — standar: foto full-bleed, teks rata tengah ================= */}
+      <div className="relative left-1/2 -translate-x-1/2 w-screen h-[40vh] min-h-[320px] sm:h-[46vh] sm:min-h-[380px] lg:h-[52vh] lg:min-h-[440px] lg:max-h-[520px]">
         <div className="absolute inset-0">
           {data.foto_kantor ? (
             <Image
@@ -135,194 +140,177 @@ export default function ProfilDesa({ profil }) {
               alt={`Kantor Desa ${data.nama_desa}`}
               fill
               priority
-              className="object-cover"
+              quality={90}
+              className="object-cover object-center"
               sizes="100vw"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-desa-green via-desa-leaf to-desa-green" />
+            <div className="absolute inset-0 bg-desa-green" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-white" />
-          <ContourPattern className="absolute -top-6 right-0 w-72 h-56 text-white/20 pointer-events-none" />
+          <div className="absolute inset-0 bg-black/45" />
         </div>
 
-        {/* judul singkat di atas foto */}
-        <div className="relative h-full flex flex-col justify-center px-4 sm:px-6 lg:px-8 text-white">
-          <p className="uppercase tracking-[0.25em] text-xs sm:text-sm text-white/70 mb-3">
+        <div
+          className={`relative h-full flex flex-col items-center justify-center text-center text-white ${CONTAINER}`}
+        >
+          <p className="uppercase tracking-[0.2em] text-xs sm:text-sm text-white/70 mb-3">
             Profil Desa
           </p>
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-semibold max-w-3xl leading-tight">
+          <h1 className="font-display text-3xl sm:text-5xl font-bold leading-tight">
             Desa {data.nama_desa}
           </h1>
-          <p className="mt-3 text-white/80 text-sm sm:text-base">
-            {data.kecamatan}, {data.kabupaten}, {data.provinsi}
+          <p className="mt-3 text-white/85 text-sm sm:text-base">
+            Kecamatan {data.kecamatan}, Kabupaten {data.kabupaten},{" "}
+            {data.provinsi}
           </p>
-        </div>
-
-        {/* kartu statistik nempel di bagian bawah foto */}
-        <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-lg border border-black/5 grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-black/5 max-w-5xl mx-auto">
-            {STATS(data).map(({ icon: Icon, label, value }) => (
-              <div
-                key={label}
-                className="px-4 py-5 sm:px-6 sm:py-6 flex flex-col items-center text-center gap-1.5"
-              >
-                <Icon size={18} className="text-desa-gold" />
-                <span className="font-display text-lg sm:text-xl font-semibold text-desa-green">
-                  {value}
-                </span>
-                <span className="text-[11px] sm:text-xs text-gray-400 uppercase tracking-wide">
-                  {label}
-                </span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
-      {/* spacer supaya konten berikutnya tidak ketutup kartu statistik */}
-      <div className="h-16 sm:h-20" />
-
-      {/* ---------- VISI & MISI ---------- */}
-      <section className="relative bg-white border-b border-black/5 overflow-hidden mb-10 sm:mb-16">
-        <ContourPattern className="absolute inset-0 w-full h-full text-desa-green/[0.05] pointer-events-none" />
-
-        <div className="relative grid lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-black/5">
-          {/* Kiri — Visi */}
-          <div className="p-6 sm:p-10 lg:p-12 flex flex-col">
-            <div className="flex items-center gap-2 mb-6">
-              <Target size={20} className="text-desa-gold" />
-              <h2 className="font-display font-semibold text-desa-green text-2xl sm:text-3xl">
-                Visi
-              </h2>
-            </div>
-            <div className="relative flex-1 flex items-center">
-              <Quote
-                className="absolute -top-2 -left-1 text-desa-gold/20"
-                size={56}
-              />
-              <p className="relative z-10 font-display text-desa-green font-medium text-xl sm:text-2xl lg:text-3xl italic leading-snug pl-8">
-                &ldquo;{data.visi}&rdquo;
-              </p>
-            </div>
-            <div className="mt-8 flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-full overflow-hidden bg-desa-green/15 shrink-0">
-                {data.foto_kades ? (
-                  <Image
-                    src={data.foto_kades}
-                    alt={data.nama_kades}
-                    fill
-                    className="object-cover"
-                    sizes="48px"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-desa-green/40 text-sm font-semibold">
-                    {data.nama_kades?.[0] ?? "K"}
+      {/* ---------- STATISTIK — overlap pakai margin negatif, jadi tetap pas walau tinggi kotak berubah-ubah di mobile ---------- */}
+      <div className="relative left-1/2 -translate-x-1/2 w-screen z-30">
+        <div
+          className={`${CONTAINER} relative -mt-14 sm:-mt-16 lg:-mt-16 pb-10 sm:pb-12`}
+        >
+          <div className="w-full sm:w-[88%] max-w-6xl mx-auto rounded-[2.5rem] sm:rounded-[3rem] border border-black/5 bg-white shadow-xl px-6 sm:px-12 lg:px-16 py-8 sm:py-10">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-0 sm:divide-x sm:divide-black/10">
+              {STATS(data).map(({ icon: Icon, label, value }, i) => (
+                <div
+                  key={label}
+                  className={`flex items-center gap-4 sm:flex-1 min-w-0 ${
+                    i === 0 ? "" : "sm:pl-8 lg:pl-10"
+                  } ${i !== STATS(data).length - 1 ? "sm:pr-2" : ""}`}
+                >
+                  <div className="w-11 h-11 rounded-full bg-desa-green/10 flex items-center justify-center shrink-0">
+                    <Icon size={20} className="text-desa-gold" />
                   </div>
-                )}
-              </div>
-              <div>
-                <p className="text-base font-semibold text-desa-green">
-                  {data.nama_kades}
-                </p>
-                <p className="text-sm text-gray-400">
-                  Visi Pembangunan Desa {data.nama_desa}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Kanan — Misi */}
-          <div className="p-6 sm:p-10 lg:p-12">
-            <div className="flex items-center gap-2 mb-6">
-              <Landmark size={20} className="text-desa-gold" />
-              <h2 className="font-display font-semibold text-desa-green text-2xl sm:text-3xl">
-                Misi
-              </h2>
-            </div>
-            <div className="space-y-6">
-              {misiList.map((m, i) => (
-                <div key={i} className="flex gap-4">
-                  <span className="shrink-0 w-9 h-9 rounded-full bg-desa-green/10 text-desa-green font-bold text-sm flex items-center justify-center">
-                    {i + 1}
-                  </span>
-                  <p className="text-lg sm:text-xl text-gray-700 leading-relaxed">
-                    {m}
-                  </p>
+                  <div className="min-w-0">
+                    <p className="font-display text-sm sm:text-base font-bold text-desa-green uppercase tracking-wide leading-tight">
+                      {label}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-400 mt-0.5 break-words sm:truncate">
+                      {value}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ================= VISI & MISI ================= */}
+      <section className="relative left-1/2 -translate-x-1/2 w-screen bg-[#F7F7F5]">
+        <div className={`${CONTAINER} ${SECTION_Y}`}>
+          <SectionHeading eyebrow="Arah Pembangunan Desa" title="Visi & Misi" />
+
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
+            {/* Visi */}
+            <div className="bg-white rounded-xl border border-black/5 shadow-sm p-6 sm:p-8">
+              <h3 className="font-display font-semibold text-desa-green text-lg mb-4">
+                Visi
+              </h3>
+              <p className="text-gray-700 text-sm sm:text-base leading-relaxed">
+                &ldquo;{data.visi}&rdquo;
+              </p>
+
+              <div className="mt-6 pt-6 border-t border-black/5 flex items-center gap-3">
+                <div className="relative w-11 h-11 rounded-full overflow-hidden bg-desa-green/10 shrink-0">
+                  {data.foto_kades ? (
+                    <Image
+                      src={data.foto_kades}
+                      alt={data.nama_kades}
+                      fill
+                      className="object-cover"
+                      sizes="44px"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-desa-green/40 text-sm font-semibold">
+                      {data.nama_kades?.[0] ?? "K"}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-desa-green">
+                    {data.nama_kades}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Kepala Desa {data.nama_desa}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Misi */}
+            <div className="bg-white rounded-xl border border-black/5 shadow-sm p-6 sm:p-8">
+              <h3 className="font-display font-semibold text-desa-green text-lg mb-4">
+                Misi
+              </h3>
+              <ol className="space-y-4">
+                {misiList.map((m, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="shrink-0 w-7 h-7 rounded-full bg-desa-green/10 text-desa-green font-bold text-xs flex items-center justify-center">
+                      {i + 1}
+                    </span>
+                    <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                      {m}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* ---------- CTA: KONTAK DESA (kiri: hubungi, kanan: peta langsung) ---------- */}
-      <section className="relative overflow-hidden mb-10 sm:mb-16">
-        <div className="grid lg:grid-cols-2">
-          {/* Kiri — Info + flow kontak */}
-          <div className="relative bg-gradient-to-br from-desa-green via-desa-leaf to-desa-green text-white p-6 py-10 sm:p-10 sm:py-14 lg:p-12 lg:py-16">
-            <ContourPattern className="absolute inset-0 w-full h-full text-white/10 pointer-events-none" />
+      {/* ================= KONTAK & PETA ================= */}
+      <section className="relative left-1/2 -translate-x-1/2 w-screen bg-white">
+        <div className={`${CONTAINER} ${SECTION_Y}`}>
+          <SectionHeading eyebrow="Kami Siap Membantu" title="Hubungi Kami" />
 
-            <div className="relative">
-              <p className="uppercase tracking-[0.25em] text-xs text-white/70 mb-3">
-                Hubungi Kami
-              </p>
-              <h2 className="font-display text-2xl sm:text-4xl font-semibold mb-3">
-                Butuh layanan atau informasi dari Desa {data.nama_desa}?
-              </h2>
-              <p className="text-white/85 text-sm sm:text-base leading-relaxed mb-8">
-                Datang langsung ke kantor desa, atau hubungi kami melalui kontak
-                di bawah ini. Kami siap membantu keperluan administrasi dan
-                pelayanan warga.
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10">
+            {/* Kiri — info kontak + CTA */}
+            <div className="rounded-xl border border-black/5 shadow-sm p-6 sm:p-8">
+              <p className="text-gray-600 text-sm leading-relaxed mb-6">
+                Datang langsung ke kantor desa pada jam pelayanan, atau hubungi
+                kami melalui kontak di bawah ini.
               </p>
 
-              <div className="grid sm:grid-cols-2 gap-4 mb-8">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex flex-col gap-1.5">
-                  <MapPin size={18} className="text-desa-gold" />
-                  <span className="text-xs uppercase tracking-wide text-white/60">
-                    Alamat
-                  </span>
-                  <span className="text-sm leading-snug">
+              <div className="space-y-4 mb-8 text-sm">
+                <div className="flex items-start gap-3">
+                  <MapPin
+                    size={18}
+                    className="text-desa-gold mt-0.5 shrink-0"
+                  />
+                  <span className="text-gray-700 leading-snug">
                     {data.alamat_kantor}
                   </span>
                 </div>
-
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex flex-col gap-1.5">
-                  <Clock size={18} className="text-desa-gold" />
-                  <span className="text-xs uppercase tracking-wide text-white/60">
-                    Jam Pelayanan
-                  </span>
-                  <span className="text-sm leading-snug">
+                <div className="flex items-start gap-3">
+                  <Clock size={18} className="text-desa-gold mt-0.5 shrink-0" />
+                  <span className="text-gray-700 leading-snug">
                     {data.jam_pelayanan}
                   </span>
                 </div>
-
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex flex-col gap-1.5">
-                  <Phone size={18} className="text-desa-gold" />
-                  <span className="text-xs uppercase tracking-wide text-white/60">
-                    Telepon
-                  </span>
-                  <span className="text-sm leading-snug">
+                <div className="flex items-start gap-3">
+                  <Phone size={18} className="text-desa-gold mt-0.5 shrink-0" />
+                  <span className="text-gray-700 leading-snug">
                     {data.telepon_kantor}
                   </span>
                 </div>
-
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 flex flex-col gap-1.5">
-                  <Mail size={18} className="text-desa-gold" />
-                  <span className="text-xs uppercase tracking-wide text-white/60">
-                    Email
-                  </span>
-                  <span className="text-sm leading-snug break-all">
+                <div className="flex items-start gap-3">
+                  <Mail size={18} className="text-desa-gold mt-0.5 shrink-0" />
+                  <span className="text-gray-700 leading-snug break-all">
                     {data.email_kantor}
                   </span>
                 </div>
               </div>
 
-              {/* ---- Flow: Hubungi -> Kades/Kadus -> pilih Dusun ---- */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 sm:p-6">
+              {/* Flow: Hubungi -> Kades/Kadus -> pilih Dusun */}
+              <div className="rounded-lg bg-desa-green/[0.04] border border-desa-green/10 p-4 sm:p-5">
                 {contactStep === "idle" && (
                   <button
                     onClick={() => setContactStep("choose-role")}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-desa-gold text-desa-green font-semibold rounded-full px-6 py-3 text-sm hover:opacity-90 transition"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-desa-green text-white font-semibold rounded-lg px-6 py-3.5 text-sm shadow-sm hover:bg-desa-green/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-desa-green transition"
                   >
                     <MessageCircle size={16} />
                     Hubungi via WhatsApp
@@ -332,13 +320,13 @@ export default function ProfilDesa({ profil }) {
                 {contactStep === "choose-role" && (
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <p className="text-sm font-semibold text-white">
+                      <p className="text-sm font-semibold text-desa-green">
                         Ingin menghubungi siapa?
                       </p>
                       <button
                         onClick={() => setContactStep("idle")}
                         aria-label="Tutup"
-                        className="text-white/60 hover:text-white"
+                        className="text-gray-400 hover:text-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-desa-green rounded"
                       >
                         <X size={16} />
                       </button>
@@ -346,14 +334,14 @@ export default function ProfilDesa({ profil }) {
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         onClick={() => openWhatsApp(data.whatsapp_kantor)}
-                        className="flex flex-col items-center gap-2 bg-white/10 hover:bg-white/20 rounded-xl px-4 py-4 text-sm transition"
+                        className="flex flex-col items-center gap-2 bg-white border border-black/5 hover:border-desa-green/30 hover:bg-desa-green/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-desa-green rounded-lg px-4 py-4 text-sm text-desa-green font-medium transition"
                       >
                         <UserRound size={20} className="text-desa-gold" />
                         Kepala Desa
                       </button>
                       <button
                         onClick={() => setContactStep("choose-dusun")}
-                        className="flex flex-col items-center gap-2 bg-white/10 hover:bg-white/20 rounded-xl px-4 py-4 text-sm transition"
+                        className="flex flex-col items-center gap-2 bg-white border border-black/5 hover:border-desa-green/30 hover:bg-desa-green/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-desa-green rounded-lg px-4 py-4 text-sm text-desa-green font-medium transition"
                       >
                         <Home size={20} className="text-desa-gold" />
                         Kepala Dusun
@@ -367,19 +355,20 @@ export default function ProfilDesa({ profil }) {
                     <div className="flex items-center justify-between mb-4">
                       <button
                         onClick={() => setContactStep("choose-role")}
-                        className="text-xs text-white/60 hover:text-white"
+                        className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-desa-green focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-desa-green rounded"
                       >
-                        &larr; Kembali
+                        <ArrowLeft size={12} />
+                        Kembali
                       </button>
                       <button
                         onClick={() => setContactStep("idle")}
                         aria-label="Tutup"
-                        className="text-white/60 hover:text-white"
+                        className="text-gray-400 hover:text-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-desa-green rounded"
                       >
                         <X size={16} />
                       </button>
                     </div>
-                    <p className="text-sm font-semibold text-white mb-3">
+                    <p className="text-sm font-semibold text-desa-green mb-3">
                       Pilih dusun:
                     </p>
                     <div className="space-y-2">
@@ -387,17 +376,20 @@ export default function ProfilDesa({ profil }) {
                         <button
                           key={dusun.nama}
                           onClick={() => openWhatsApp(dusun.whatsapp)}
-                          className="w-full flex items-center justify-between bg-white/10 hover:bg-white/20 rounded-xl px-4 py-3 text-sm transition"
+                          className="w-full flex items-center justify-between bg-white border border-black/5 hover:border-desa-green/30 hover:bg-desa-green/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-desa-green rounded-lg px-4 py-3 text-sm transition"
                         >
                           <span className="text-left">
-                            <span className="block font-medium">
+                            <span className="block font-medium text-desa-green">
                               {dusun.nama}
                             </span>
-                            <span className="block text-white/60 text-xs">
+                            <span className="block text-gray-500 text-xs">
                               {dusun.nama_kadus}
                             </span>
                           </span>
-                          <ChevronRight size={16} className="text-white/60" />
+                          <ChevronRight
+                            size={16}
+                            className="text-gray-400 shrink-0"
+                          />
                         </button>
                       ))}
                     </div>
@@ -405,17 +397,17 @@ export default function ProfilDesa({ profil }) {
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Kanan — Peta langsung, tanpa tombol */}
-          <div className="relative min-h-[360px] lg:min-h-0">
-            <iframe
-              src={mapsEmbedUrl}
-              title={`Lokasi Desa ${data.nama_desa}`}
-              className="absolute inset-0 w-full h-full border-0"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+            {/* Kanan — peta */}
+            <div className="relative min-h-[280px] lg:min-h-full rounded-xl overflow-hidden border border-black/5 shadow-sm">
+              <iframe
+                src={mapsEmbedUrl}
+                title={`Lokasi Desa ${data.nama_desa}`}
+                className="absolute inset-0 w-full h-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
           </div>
         </div>
       </section>

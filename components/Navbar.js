@@ -26,8 +26,8 @@ const menu = [
   {
     label: "Data Desa",
     children: [
-      { href: "/data-kependudukan", label: "Kependudukan" },
-      { href: "/keuangan", label: "Keuangan Desa" },
+      { href: "/data-kependudukan", label: "Data Kependudukan" },
+      { href: "/keuangan", label: "Keuangan Desa - APBDes" },
       { href: "/geotagging", label: "Peta Desa" },
     ],
   },
@@ -35,25 +35,39 @@ const menu = [
   { href: "/umkm", label: "Potensi Desa" },
   { href: "/kontak", label: "Kontak" },
 
-  // Tambahkan ini
   {
-    label: "Masuk",
+    label: "Aplikasi Keuangan",
     children: [
-      { href: "/login", label: "Login Admin Web" }, // hapus external: true, ganti href
       {
-        href: "https://sigampil.pangandarankab.go.id/",
-        label: "Login Sigampil",
+        href: "https://konsolidasi-apbdesa.kemendagri.go.id/",
+        label: "Siskeudes",
         external: true,
       },
       {
-        href: "https://pagergunung.id",
-        label: "Situs Resmi Desa Lainnya",
+        href: "https://bjbdigi.bankbjb.co.id/",
+        label: "BJB Digi",
+        external: true,
+      },
+      {
+        href: "https://coretaxdjp.pajak.go.id/",
+        label: "Coretax",
+        external: true,
+      },
+      {
+        href: "https://spanint.kemenkeu.go.id/",
+        label: "OM-SPAN",
+        external: true,
+      },
+      {
+        href: "https://sigampil.pangandarankab.go.id/",
+        label: "Sigampil",
         external: true,
       },
     ],
   },
-];
 
+  { href: "/login", label: "Masuk" },
+];
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -80,11 +94,11 @@ export default function Navbar() {
           </span>
           <div className="flex items-center gap-4 ml-auto sm:ml-0">
             <a
-              href="tel:+62000000000"
+              href="tel:+6282316984735"
               className="flex items-center gap-1 hover:opacity-80"
             >
               <Phone size={12} />
-              <span className="hidden md:inline">(0265) 000-000</span>
+              <span className="hidden md:inline">0823-1698-4735 (Kades)</span>
             </a>
             <a
               href="mailto:desa@pagergunung.id"
